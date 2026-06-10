@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projek Sewaan Sekolah Kuantan - Dashboard</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 14px; height: 14px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f1710; border-left: 2px solid #234520; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #33ff00; border: 3px solid #0f1710; border-radius: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-corner { background: #0f1710; }
+        
+        .crt-flicker { animation: flicker 0.15s infinite; }
+        @keyframes flicker {
+            0% { opacity: 0.95; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+        
+        /* Custom arbitrary Tailwind utilities that CDN might miss natively without config */
+        .text-shadow-green { text-shadow: 0 0 5px #22c55e; }
+        .text-shadow-lcd { text-shadow: 1px 1px 0px rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="min-h-screen bg-neutral-900 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-800 to-black font-sans text-gray-800">
+
+    <!-- LOADING SCREEN -->
+    <div id="loading-screen" class="min-h-screen flex items-center justify-center font-mono p-4 bg-[#111111]">
+        <div class="bg-[#8ca878] border-[12px] border-gray-900 p-8 md:p-16 rounded-2xl shadow-[0_0_60px_rgba(140,168,120,0.3),inset_0_0_30px_rgba(0,0,0,0.6)] flex flex-col items-center">
+            <div class="text-[#1a2b10] text-3xl md:text-5xl mb-6 font-black animate-pulse text-center">SYSTEM BOOTING...</div>
+            <div class="text-[#1a2b10] text-lg md:text-xl font-bold opacity-80 text-center">DOWNLOADING MAINFRAME DATA</div>
+        </div>
+    </div>
+
+    <!-- ERROR SCREEN -->
+    <div id="error-screen" class="hidden min-h-screen flex items-center justify-center font-mono p-4 bg-[#111111]">
+        <div class="bg-red-900 border-[12px] border-gray-900 p-8 md:p-16 rounded-2xl shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] text-white text-center">
+            <div class="text-4xl md:text-5xl mb-6 font-black animate-pulse text-red-400">CRITICAL ERROR</div>
+            <div id="error-message" class="text-xl"></div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboard-screen" class="hidden p-4 md:p-10">
+        <!-- Main Physical Dashboard Board -->
+        <div class="max-w-[1400px] mx-auto bg-[#363a40] border-[8px] border-[#25282d] rounded-[2rem] shadow-[15px_15px_40px_rgba(0,0,0,0.9),-5px_-5px_15px_rgba(255,255,255,0.05)] p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 relative overflow-hidden">
+            
+            <!-- Metallic Texture Overlay -->
+            <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAiPjwvcmVjdD4KPGNpcmNsZSBjeD0iNCIgY3k9IjQiIHI9IjEiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMSI+PC9jaXJjbGU+Cjwvc3ZnPg==')] pointer-events-none"></div>
+
+            <!-- BENTO ROW 1: Header Plaque -->
+            <div class="col-span-1 lg:col-span-12 flex flex-col md:flex-row justify-between items-center bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 border-[4px] border-gray-600 rounded-xl shadow-[0_10px_20px_rgba(0,0,0,0.6),inset_0_2px_5px_rgba(255,255,255,0.9)] p-4 md:p-6 relative z-10">
+                <!-- Screws -->
+                <div class="absolute top-2 left-2 w-3 h-3 rounded-full bg-gray-500 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.8)]"></div>
+                <div class="absolute top-2 right-2 w-3 h-3 rounded-full bg-gray-500 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.8)]"></div>
+                <div class="absolute bottom-2 left-2 w-3 h-3 rounded-full bg-gray-500 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.8)]"></div>
+                <div class="absolute bottom-2 right-2 w-3 h-3 rounded-full bg-gray-500 shadow-[inset_1px_1px_3px_rgba(0,0,0,0.8)]"></div>
+
+                <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                    <div class="bg-gray-800 p-3 rounded-full shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),0_2px_4px_rgba(255,255,255,0.5)]">
+                        <i data-lucide="database" class="w-8 h-8 text-gray-300"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-3xl font-black text-gray-800 uppercase tracking-[0.15em] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+                            PROJEK SEWAAN SEKOLAH-SEKOLAH KUANTAN
+                        </h1>
+                        <p class="text-xs md:text-sm text-gray-600 font-bold uppercase tracking-widest mt-1">Dashboard Analitik Pendidikan</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3 bg-gray-800 border-2 border-gray-900 p-3 rounded-lg shadow-[inset_0_3px_8px_rgba(0,0,0,0.8)]">
+                    <i data-lucide="power" class="w-5 h-5 text-green-500 drop-shadow-[0_0_10px_#22c55e]"></i>
+                    <span class="text-xs text-green-500 font-mono font-bold tracking-widest animate-pulse text-shadow-green">SYS_ONLINE</span>
+                </div>
+            </div>
+
+            <!-- BENTO ROW 2 & 3: Filters (Left) & Layout Array (Right) -->
+            
+            <!-- Filters Rack Panel -->
+            <div class="col-span-1 lg:col-span-4 bg-gray-800 rounded-2xl border-[6px] border-gray-900 shadow-[inset_0_10px_30px_rgba(0,0,0,0.9),0_10px_20px_rgba(0,0,0,0.5)] p-6 relative z-10 flex flex-col">
+                <div class="text-gray-400 font-bold uppercase tracking-widest text-sm mb-6 border-b border-gray-700 pb-2 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+                    Panel Kawalan Filter
+                </div>
+
+                <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2">
+                    <!-- Filter 1: Kod Sekolah -->
+                    <div class="flex flex-col mb-5 relative group">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" for="filterKod">Kod Sekolah</label>
+                            <div id="ledKod" class="w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]"></div>
+                        </div>
+                        <div class="relative">
+                            <select id="filterKod" class="filter-select w-full appearance-none bg-gradient-to-b from-[#e1e4e8] to-[#bdc3c7] text-gray-900 font-bold px-4 py-3 rounded-lg border-2 border-gray-500 shadow-[0_6px_10px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.9)] focus:outline-none focus:border-blue-600 transition-all cursor-pointer hover:from-[#eaedef] hover:to-[#c8ced2]">
+                                <option value="">[ SEMUA DATA ]</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                                <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter 2: Nama Sekolah -->
+                    <div class="flex flex-col mb-5 relative group">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" for="filterNama">Nama Sekolah</label>
+                            <div id="ledNama" class="w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]"></div>
+                        </div>
+                        <div class="relative">
+                            <select id="filterNama" class="filter-select w-full appearance-none bg-gradient-to-b from-[#e1e4e8] to-[#bdc3c7] text-gray-900 font-bold px-4 py-3 rounded-lg border-2 border-gray-500 shadow-[0_6px_10px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.9)] focus:outline-none focus:border-blue-600 transition-all cursor-pointer hover:from-[#eaedef] hover:to-[#c8ced2]">
+                                <option value="">[ SEMUA DATA ]</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                                <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter 3: Pentadbiran -->
+                    <div class="flex flex-col mb-5 relative group">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" for="filterPentadbiran">Pentadbiran</label>
+                            <div id="ledPentadbiran" class="w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]"></div>
+                        </div>
+                        <div class="relative">
+                            <select id="filterPentadbiran" class="filter-select w-full appearance-none bg-gradient-to-b from-[#e1e4e8] to-[#bdc3c7] text-gray-900 font-bold px-4 py-3 rounded-lg border-2 border-gray-500 shadow-[0_6px_10px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.9)] focus:outline-none focus:border-blue-600 transition-all cursor-pointer hover:from-[#eaedef] hover:to-[#c8ced2]">
+                                <option value="">[ SEMUA DATA ]</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                                <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter 4: Pengajaran & Pembelajaran -->
+                    <div class="flex flex-col mb-5 relative group">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" for="filterPdp">Pengajaran & Pembelajaran</label>
+                            <div id="ledPdp" class="w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]"></div>
+                        </div>
+                        <div class="relative">
+                            <select id="filterPdp" class="filter-select w-full appearance-none bg-gradient-to-b from-[#e1e4e8] to-[#bdc3c7] text-gray-900 font-bold px-4 py-3 rounded-lg border-2 border-gray-500 shadow-[0_6px_10px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.9)] focus:outline-none focus:border-blue-600 transition-all cursor-pointer hover:from-[#eaedef] hover:to-[#c8ced2]">
+                                <option value="">[ SEMUA DATA ]</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                                <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter 5: Peranti Guru -->
+                    <div class="flex flex-col mb-5 relative group">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" for="filterPeranti">Peranti Guru</label>
+                            <div id="ledPeranti" class="w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]"></div>
+                        </div>
+                        <div class="relative">
+                            <select id="filterPeranti" class="filter-select w-full appearance-none bg-gradient-to-b from-[#e1e4e8] to-[#bdc3c7] text-gray-900 font-bold px-4 py-3 rounded-lg border-2 border-gray-500 shadow-[0_6px_10px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.9)] focus:outline-none focus:border-blue-600 transition-all cursor-pointer hover:from-[#eaedef] hover:to-[#c8ced2]">
+                                <option value="">[ SEMUA DATA ]</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                                <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter 6: Nama PTIS Seliaan -->
+                    <div class="flex flex-col mb-5 relative group">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]" for="filterPtis">Nama PTIS Seliaan</label>
+                            <div id="ledPtis" class="w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]"></div>
+                        </div>
+                        <div class="relative">
+                            <select id="filterPtis" class="filter-select w-full appearance-none bg-gradient-to-b from-[#e1e4e8] to-[#bdc3c7] text-gray-900 font-bold px-4 py-3 rounded-lg border-2 border-gray-500 shadow-[0_6px_10px_rgba(0,0,0,0.4),inset_0_2px_4px_rgba(255,255,255,0.9)] focus:outline-none focus:border-blue-600 transition-all cursor-pointer hover:from-[#eaedef] hover:to-[#c8ced2]">
+                                <option value="">[ SEMUA DATA ]</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4">
+                                <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[8px] border-l-transparent border-r-transparent border-t-gray-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.6)]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Physical Reset Button -->
+                <button id="resetBtn" class="mt-6 w-full bg-gradient-to-b from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 active:from-red-900 active:to-black text-white font-bold py-4 rounded-xl border-[3px] border-red-950 shadow-[0_8px_15px_rgba(0,0,0,0.6),inset_0_2px_4px_rgba(255,255,255,0.4)] active:shadow-[0_2px_4px_rgba(0,0,0,0.6),inset_0_6px_12px_rgba(0,0,0,0.8)] active:translate-y-2 transition-all flex items-center justify-center space-x-3 group">
+                    <i data-lucide="refresh-cw" class="w-5 h-5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] group-active:animate-spin"></i>
+                    <span class="drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-widest uppercase">Set Semula Modul</span>
+                </button>
+            </div>
+
+            <!-- Right Side: Scorecards & Data Table -->
+            <div class="col-span-1 lg:col-span-8 flex flex-col gap-8 z-10">
+                
+                <!-- LCD Scorecards Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 bg-gray-700 p-6 rounded-2xl border-[4px] border-gray-800 shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)]">
+                    
+                    <!-- Scorecard Block -->
+                    <div class="flex flex-col items-center p-4 bg-gray-800 rounded-2xl border-[5px] border-gray-900 shadow-[inset_0_15px_25px_rgba(0,0,0,0.8),0_2px_4px_rgba(255,255,255,0.15)] relative">
+                        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <h3 class="text-[10px] sm:text-xs text-gray-400 mb-3 font-bold uppercase tracking-widest text-center h-8 flex items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">Kod Sekolah</h3>
+                        <div class="w-full bg-[#8ca878] rounded-md border-[3px] border-gray-950 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.6),inset_-2px_-2px_6px_rgba(255,255,255,0.3)] p-2 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/10 pointer-events-none"></div>
+                            <div id="scoreKod" class="text-right text-[#1a2b10] font-mono text-3xl sm:text-4xl tracking-widest font-black z-10 relative text-shadow-lcd">0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center p-4 bg-gray-800 rounded-2xl border-[5px] border-gray-900 shadow-[inset_0_15px_25px_rgba(0,0,0,0.8),0_2px_4px_rgba(255,255,255,0.15)] relative">
+                        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <h3 class="text-[10px] sm:text-xs text-gray-400 mb-3 font-bold uppercase tracking-widest text-center h-8 flex items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">Nama Sekolah</h3>
+                        <div class="w-full bg-[#8ca878] rounded-md border-[3px] border-gray-950 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.6),inset_-2px_-2px_6px_rgba(255,255,255,0.3)] p-2 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/10 pointer-events-none"></div>
+                            <div id="scoreNama" class="text-right text-[#1a2b10] font-mono text-3xl sm:text-4xl tracking-widest font-black z-10 relative text-shadow-lcd">0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center p-4 bg-gray-800 rounded-2xl border-[5px] border-gray-900 shadow-[inset_0_15px_25px_rgba(0,0,0,0.8),0_2px_4px_rgba(255,255,255,0.15)] relative">
+                        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <h3 class="text-[10px] sm:text-xs text-gray-400 mb-3 font-bold uppercase tracking-widest text-center h-8 flex items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">Pentadbiran</h3>
+                        <div class="w-full bg-[#8ca878] rounded-md border-[3px] border-gray-950 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.6),inset_-2px_-2px_6px_rgba(255,255,255,0.3)] p-2 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/10 pointer-events-none"></div>
+                            <div id="scorePentadbiran" class="text-right text-[#1a2b10] font-mono text-3xl sm:text-4xl tracking-widest font-black z-10 relative text-shadow-lcd">0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center p-4 bg-gray-800 rounded-2xl border-[5px] border-gray-900 shadow-[inset_0_15px_25px_rgba(0,0,0,0.8),0_2px_4px_rgba(255,255,255,0.15)] relative">
+                        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <h3 class="text-[10px] sm:text-xs text-gray-400 mb-3 font-bold uppercase tracking-widest text-center h-8 flex items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">Pengajaran & Pembelajaran</h3>
+                        <div class="w-full bg-[#8ca878] rounded-md border-[3px] border-gray-950 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.6),inset_-2px_-2px_6px_rgba(255,255,255,0.3)] p-2 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/10 pointer-events-none"></div>
+                            <div id="scorePdp" class="text-right text-[#1a2b10] font-mono text-3xl sm:text-4xl tracking-widest font-black z-10 relative text-shadow-lcd">0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center p-4 bg-gray-800 rounded-2xl border-[5px] border-gray-900 shadow-[inset_0_15px_25px_rgba(0,0,0,0.8),0_2px_4px_rgba(255,255,255,0.15)] relative">
+                        <div class="absolute top-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 left-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <div class="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-gray-400 shadow-[inset_1px_1px_2px_rgba(255,255,255,0.8),inset_-1px_-1px_2px_rgba(0,0,0,0.8)]"></div>
+                        <h3 class="text-[10px] sm:text-xs text-gray-400 mb-3 font-bold uppercase tracking-widest text-center h-8 flex items-center drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">Peranti Guru</h3>
+                        <div class="w-full bg-[#8ca878] rounded-md border-[3px] border-gray-950 shadow-[inset_4px_4px_8px_rgba(0,0,0,0.6),inset_-2px_-2px_6px_rgba(255,255,255,0.3)] p-2 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/10 pointer-events-none"></div>
+                            <div id="scorePeranti" class="text-right text-[#1a2b10] font-mono text-3xl sm:text-4xl tracking-widest font-black z-10 relative text-shadow-lcd">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRT Terminal Screen for Data Table -->
+                <div class="flex-1 bg-[#0a0a0a] border-[12px] border-gray-900 rounded-[2rem] shadow-[inset_0_30px_60px_rgba(0,0,0,1),0_15px_30px_rgba(0,0,0,0.6)] p-6 md:p-8 relative overflow-hidden flex flex-col min-h-[400px]">
+                    
+                    <!-- CRT Screen Effects -->
+                    <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.3)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] z-20 opacity-70"></div>
+                    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.6)_100%)] z-30"></div>
+
+                    <!-- Terminal Header -->
+                    <div class="text-[#33ff00] font-mono text-xs sm:text-sm mb-4 border-b-2 border-[#33ff00]/40 pb-3 z-10 relative flex justify-between drop-shadow-[0_0_8px_#33ff00]">
+                        <span class="uppercase">&gt; DB_QUERY: /KUANTAN/SEWAAN_LIST.EXE</span>
+                        <span>REKOD DIJUMPAI: [<span id="recordCount">0</span>]</span>
+                    </div>
+
+                    <!-- Scrollable Data Area -->
+                    <div class="overflow-auto relative z-10 flex-1 custom-scrollbar crt-flicker">
+                        <table class="w-full text-left text-[#33ff00] font-mono text-[10px] sm:text-xs tracking-wider">
+                            <thead class="sticky top-0 bg-[#0a0a0a] z-20 shadow-[0_4px_10px_#0a0a0a]">
+                                <tr>
+                                    <th class="py-3 px-4 border-b-2 border-[#33ff00]/60 whitespace-nowrap">KOD SEKOLAH</th>
+                                    <th class="py-3 px-4 border-b-2 border-[#33ff00]/60 min-w-[250px]">NAMA SEKOLAH</th>
+                                    <th class="py-3 px-4 border-b-2 border-[#33ff00]/60 text-center">PENTADBIRAN</th>
+                                    <th class="py-3 px-4 border-b-2 border-[#33ff00]/60 text-center">PDP</th>
+                                    <th class="py-3 px-4 border-b-2 border-[#33ff00]/60 text-center">PERANTI GURU</th>
+                                    <th class="py-3 px-4 border-b-2 border-[#33ff00]/60 min-w-[200px]">PTIS SELIAAN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody">
+                                <!-- Data injects here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic (Vanilla JavaScript) -->
+    <script>
+        // Init Lucide Icons
+        lucide.createIcons();
+
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTrQS5SS1aKLpCrqzB1ACDY40oTU13c0DyD_w37f7StVcFFC4F5vR2Wgj1mcdE5acGx4A3nZ_hUd9Bg/pub?output=csv";
+        let allData = [];
+        let filteredData = [];
+
+        // --- CSV PARSER ---
+        function parseCSV(str) {
+            const arr = [];
+            let quote = false;
+            let row = [], col = '';
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c + 1];
+                if (cc === '"' && quote && nc === '"') { col += cc; ++c; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === ',' && !quote) { row.push(col); col = ''; continue; }
+                if (cc === '\r' && nc === '\n' && !quote) { row.push(col); arr.push(row); col = ''; row = []; ++c; continue; }
+                if (cc === '\n' && !quote) { row.push(col); arr.push(row); col = ''; row = []; continue; }
+                if (cc === '\r' && !quote) { row.push(col); arr.push(row); col = ''; row = []; continue; }
+                col += cc;
+            }
+            if (col) row.push(col);
+            if (row.length > 0) arr.push(row);
+
+            const headers = arr[0].map(h => h.trim());
+            return arr.slice(1).map(row => {
+                const obj = {};
+                headers.forEach((h, i) => {
+                    obj[h] = row[i] ? row[i].trim() : '';
+                });
+                return obj;
+            });
+        }
+
+        // --- INIT DATA FETCHING ---
+        async function initDashboard() {
+            try {
+                const response = await fetch(SHEET_URL);
+                if (!response.ok) throw new Error("Gagal menyambung ke pangkalan data Google Sheet");
+                const text = await response.text();
+                
+                allData = parseCSV(text);
+                filteredData = [...allData];
+
+                populateFilters();
+                updateDashboard();
+
+                // Switch screens
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('dashboard-screen').classList.remove('hidden');
+
+            } catch (err) {
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('error-message').innerText = err.message;
+                document.getElementById('error-screen').classList.remove('hidden');
+            }
+        }
+
+        // --- POPULATE FILTERS ---
+        function populateFilters() {
+            const getUniqueOptions = (key, isNumeric = false) => {
+                let options = [...new Set(allData.map(d => d[key]).filter(Boolean))];
+                return isNumeric 
+                    ? options.sort((a, b) => parseInt(a) - parseInt(b)) 
+                    : options.sort();
+            };
+
+            const filterMap = [
+                { id: 'filterKod', key: 'KOD SEKOLAH', numeric: false },
+                { id: 'filterNama', key: 'NAMA SEKOLAH', numeric: false },
+                { id: 'filterPentadbiran', key: 'PENTADBIRAN', numeric: true },
+                { id: 'filterPdp', key: 'PDP', numeric: true },
+                { id: 'filterPeranti', key: 'PERANTI GURU', numeric: true },
+                { id: 'filterPtis', key: 'NAMA PTIS SELIAAN', numeric: false }
+            ];
+
+            filterMap.forEach(f => {
+                const selectEl = document.getElementById(f.id);
+                const options = getUniqueOptions(f.key, f.numeric);
+                
+                options.forEach(opt => {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = opt;
+                    optionEl.textContent = opt;
+                    selectEl.appendChild(optionEl);
+                });
+
+                // Add event listener for filtering
+                selectEl.addEventListener('change', handleFilterChange);
+            });
+        }
+
+        // --- FILTERING LOGIC ---
+        function handleFilterChange() {
+            const kod = document.getElementById('filterKod').value;
+            const nama = document.getElementById('filterNama').value;
+            const pentadbiran = document.getElementById('filterPentadbiran').value;
+            const pdp = document.getElementById('filterPdp').value;
+            const peranti = document.getElementById('filterPeranti').value;
+            const ptis = document.getElementById('filterPtis').value;
+
+            // Update LEDs
+            updateLed('ledKod', kod);
+            updateLed('ledNama', nama);
+            updateLed('ledPentadbiran', pentadbiran);
+            updateLed('ledPdp', pdp);
+            updateLed('ledPeranti', peranti);
+            updateLed('ledPtis', ptis);
+
+            // Filter Data
+            filteredData = allData.filter(row => {
+                return (kod === '' || row['KOD SEKOLAH'] === kod) &&
+                       (nama === '' || row['NAMA SEKOLAH'] === nama) &&
+                       (pentadbiran === '' || row['PENTADBIRAN'] === pentadbiran) &&
+                       (pdp === '' || row['PDP'] === pdp) &&
+                       (peranti === '' || row['PERANTI GURU'] === peranti) &&
+                       (ptis === '' || row['NAMA PTIS SELIAAN'] === ptis);
+            });
+
+            updateDashboard();
+        }
+
+        // Update LED Status Colors
+        function updateLed(ledId, value) {
+            const led = document.getElementById(ledId);
+            if (value !== '') {
+                led.className = "w-2 h-2 rounded-full border border-black transition-all duration-300 bg-[#33ff00] shadow-[0_0_8px_#33ff00,inset_1px_1px_2px_rgba(255,255,255,0.8)]";
+            } else {
+                led.className = "w-2 h-2 rounded-full border border-black transition-all duration-300 bg-red-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.6)]";
+            }
+        }
+
+        // --- UPDATE UI LOGIC ---
+        function updateDashboard() {
+            // Calculate metrics
+            const totalKod = new Set(filteredData.map(d => d['KOD SEKOLAH']).filter(Boolean)).size;
+            const totalNama = new Set(filteredData.map(d => d['NAMA SEKOLAH']).filter(Boolean)).size;
+            const sumPentadbiran = filteredData.reduce((acc, curr) => acc + (parseInt(curr['PENTADBIRAN']) || 0), 0);
+            const sumPdp = filteredData.reduce((acc, curr) => acc + (parseInt(curr['PDP']) || 0), 0);
+            const sumPeranti = filteredData.reduce((acc, curr) => acc + (parseInt(curr['PERANTI GURU']) || 0), 0);
+
+            // Animate Numbers (Simple direct update)
+            document.getElementById('scoreKod').innerText = totalKod.toLocaleString();
+            document.getElementById('scoreNama').innerText = totalNama.toLocaleString();
+            document.getElementById('scorePentadbiran').innerText = sumPentadbiran.toLocaleString();
+            document.getElementById('scorePdp').innerText = sumPdp.toLocaleString();
+            document.getElementById('scorePeranti').innerText = sumPeranti.toLocaleString();
+
+            // Update Table
+            const tbody = document.getElementById('dataTableBody');
+            document.getElementById('recordCount').innerText = filteredData.length;
+            
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colSpan="6" class="py-12 text-center text-red-500 font-bold text-lg animate-pulse drop-shadow-[0_0_10px_#ef4444]">
+                            [ ERROR: TIADA REKOD PADANAN DIJUMPAI DALAM PANGKALAN DATA ]
+                        </td>
+                    </tr>
+                `;
+            } else {
+                let rowsHtml = '';
+                filteredData.forEach(row => {
+                    rowsHtml += `
+                        <tr class="hover:bg-[#33ff00]/20 transition-colors duration-75">
+                            <td class="py-3 px-4 border-b border-[#33ff00]/20">${row['KOD SEKOLAH'] || '-'}</td>
+                            <td class="py-3 px-4 border-b border-[#33ff00]/20">${row['NAMA SEKOLAH'] || '-'}</td>
+                            <td class="py-3 px-4 border-b border-[#33ff00]/20 text-center">${row['PENTADBIRAN'] || '0'}</td>
+                            <td class="py-3 px-4 border-b border-[#33ff00]/20 text-center">${row['PDP'] || '0'}</td>
+                            <td class="py-3 px-4 border-b border-[#33ff00]/20 text-center">${row['PERANTI GURU'] || '0'}</td>
+                            <td class="py-3 px-4 border-b border-[#33ff00]/20">${row['NAMA PTIS SELIAAN'] || '-'}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = rowsHtml;
+            }
+        }
+
+        // --- RESET LOGIC ---
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            const selects = document.querySelectorAll('.filter-select');
+            selects.forEach(select => select.value = '');
+            handleFilterChange();
+        });
+
+        // --- START APP ---
+        window.onload = initDashboard;
+
+    </script>
+</body>
+</html>
